@@ -61,4 +61,85 @@ feature "Managing Tasks", js: true do
     #          (Step 25) and to create the matching Sinatra route (Step 26-27)
     expect_task_list_to_be_exactly("Follow the test instructions")
   end
+
+  scenario "creating a new todo with invalid data" do #, skip: "Step 28: Unskip this test" do
+    visit "/"
+    click_link "Add task"
+    # Note: we are skipping filling in "Task Description"!
+    click_button "Save"
+    # NOTE:    Frequently we will test a handful of validations in the integration tests,
+    #          but put exhaustive tests in the model tests themselves.
+    #          Our goal in the integration tests is to make sure that if there are validation
+    #          errors that the user gets a useful error message and will be able to successfully
+    #          correct their mistakes and resubmit the form.
+    #
+    # Step 29: Before implementing UI changes to have/show validation errors,
+    #          you should first go to the model tests and add tests (Step 30) and validation (Step 31).
+    #          Then return here to continue implementation of the UI portion of the validation.
+    #
+    # Step 32: The new error messages in this test (read the stack trace!) will drive you to the
+    #          controller, where you will add some logic to check if the task object is valid before saving it
+    # Step 34: Use the lack of error notice in the UI to motivate you to add a flash message via. the controller
+    page.should have_content("Description can't be blank")
+    # NOTE: Eventually we will have a test along these lines in order to prove that we
+    #       see appropriate errors alongside the field with errors, but we will
+    #       wait to do that until we start using form builders to help us!
+    # task_description_field = find_field("Task Description")
+    # task_description_field.attr("validationMessage").should include "Please fill out this field"
+
+    # NOTE: I *always* test that resubmitting the form with corrected data works
+    #       because this is a common area for accidental breakage:
+    fill_in "Task Description", with: "Correcting my errors works!"
+    click_button "Save"
+    expect_task_list_to_be_exactly("Correcting my errors works!")
+  end
+
+  scenario "updating a todo item with valid data", skip: "Step 36: Unskip this test" do
+    # We are using a new tool here! Fabricate helps us create valid test data.
+    # You can see the definition of this fabricator in ...
+    # While the fabricator we defined is very simple now, we will expand it in
+    # future tests, at which point you will really see its value.
+    Task.create(description: 'Eat Breakfast')
+    Task.create(description: 'Finish Lab 3, finally')
+    visit '/'
+    # Note that this test doesn't stipulate that we have to do this old-school form submission.
+    # We can (and will!) easily upgrade this to be a SPA without this test having to change at all!
+    expect_task_list_to_be_exactly("Eat Breakfast", "Finish Lab 3, finally")
+    click_on "Eat Breakfast"
+    find_field("Task Description").value.should eq "Eat Breakfast"
+    fill_in "Task Description", with: "Eat Lunch"
+    click_button "Save"
+    expect_task_list_to_be_exactly("Finish Lab 3, finally", "Eat Lunch")
+  end
+
+  scenario "updating a todo item with invalid data", skip: "Step 39: Unskip this test" do
+    Task.create(description: 'Eat Breakfast')
+    visit '/'
+    expect_task_list_to_be_exactly("Eat Breakfast")
+    click_on "Eat Breakfast"
+    find_field("Task Description").value.should eq "Eat Breakfast"
+    fill_in "Task Description", with: "    "
+    click_on "Save"
+    page.should have_content("Description can't be blank")
+    # NOTE: I *always* test that resubmitting the form with corrected data works
+    #       because this is a common area for accidental breakage:
+    fill_in "Task Description", with: "Correcting my errors works!"
+    click_button "Save"
+    expect_task_list_to_be_exactly("Correcting my errors works!")
+  end
+
+  scenario "deleting a todo" do, skip: "Step 40: Unskip this test" do
+    Task.create(description: 'Eat Breakfast')
+    Task.create(description: 'Join class session')
+    Task.create(description: 'Finish Lab 3, finally')
+    visit '/'
+    expect_task_list_to_be_exactly("Eat Breakfast", "Join class session", "Finish Lab 3, finally")
+    click_on "Eat Breakfast"
+    click_button "Delete"
+
+    # It would be nice to have a confirmation dialog, but I'm going for maximum simplicity here,
+    # so I expect that clicking the Delete button will initiate the delete and send us back to
+    # the homepage
+    expect_task_list_to_be_exactly("Join class session", "Finish Lab 3, finally")
+  end
 end

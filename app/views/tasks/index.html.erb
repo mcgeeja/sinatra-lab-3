@@ -4,6 +4,12 @@
   Step 7:
   Uncomment the code below by removing the `#` characters from the ERB
 -->
+<!--
+  Step 37: Turn your task descriptions into links to the (soon to exist) edit page:
+  <a href="/tasks/12">Eat Breakfast</a>
+           ^ the path above fits in with the REST convention
+           ^ you can get the id of the task with `task.id`
+-->
 <ul id="todos">
   <%# tasks.each do |task| %>
     <li class="task">

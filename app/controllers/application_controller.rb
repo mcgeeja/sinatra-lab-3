@@ -8,6 +8,7 @@ class ApplicationController < Sinatra::Application
     logger.level = Logger::DEBUG unless production?
     set :logger, logger
     ActiveRecord::Base.logger = logger
+    enable :sessions
   end
 
   get '/' do

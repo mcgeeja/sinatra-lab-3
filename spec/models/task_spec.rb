@@ -19,5 +19,21 @@ describe "Task" do
         Task.first.description.should eq "Eat breakfast"
       end
     end
+
+    describe "without a description", skip: "Step 30: Unskip this test and the one below" do
+      let(:task){ Task.new }
+      before { task.save }
+
+      it { task.should_not be_valid }
+      it { task.errors[:description].should include "can't be blank" }
+    end
+
+    describe "with a blank description", skip: "Step 30: Unskip this test and the one above" do
+      let(:task){ Task.new(description: "    ") }
+      before { task.save }
+
+      it { task.should_not be_valid }
+      it { task.errors[:description].should include "can't be blank" }
+    end
   end
 end

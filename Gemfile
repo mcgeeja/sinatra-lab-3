@@ -7,6 +7,7 @@ gem "puma"
 gem "rake"
 gem "sinatra"
 gem "sinatra-activerecord"
+gem "sinatra-flash"
 
 group :development do
   gem 'rerun'

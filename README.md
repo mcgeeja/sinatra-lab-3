@@ -59,6 +59,7 @@ $ heroku create
 $ heroku addons:create heroku-postgresql:mini
 
 $ git push heroku main
+$ heroku run rake db:migrate
 
 $ heroku open
 ```
